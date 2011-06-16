@@ -13,10 +13,10 @@ ankens_with_error = []
 URLS = [
   {:anken_id => 1, :anken_title => "value1", :anken_url => "http://www.google.com" },
   {:anken_id => 2, :anken_title => "value2", :anken_url => "http://www.google.com" },
-  {:anken_id => 3, :anken_title => "value1", :anken_url => "http://www.google.com" },
-  {:anken_id => 4, :anken_title => "value2", :anken_url => "http://www.google.com" },
-  {:anken_id => 5, :anken_title => "value1", :anken_url => "http://www.google.com" },
-  {:anken_id => 6, :anken_title => "value2", :anken_url => "http://www.google.com/test" }
+  {:anken_id => 3, :anken_title => "value3", :anken_url => "http://www.google.com/1234" },
+  {:anken_id => 4, :anken_title => "value4", :anken_url => "http://www.google.com" },
+  {:anken_id => 5, :anken_title => "value5", :anken_url => "http://www.google.com" },
+  {:anken_id => 6, :anken_title => "value6", :anken_url => "http://www.google.com/test" }
 ]
 
 # Queue
@@ -39,12 +39,8 @@ end
     end
 end
 
-puts "Here 1"
-
 threads.each do |th|
   th.join
 end
-
-puts "Here 2"
 
 puts ankens_with_error.inspect
