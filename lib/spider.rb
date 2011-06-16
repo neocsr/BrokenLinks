@@ -1,16 +1,18 @@
 require 'net/http'
-require 'status_codes'
+require File.expand_path(File.dirname(__FILE__) + '/../lib/status_codes')
 
 class Spider
-  def initialize(output=STDOUT)
+  def initialize(name, output=STDOUT)
     @output = output
+    @name   = name
   end
 
   def setup
-    @output.puts 'Starting spider...'
+    @output.puts "Current spider '#{@name}'"
 
     @info = {
       :url           => nil,
+      :spider_name   => nil,
       :response_code => nil,
       :response_time => nil,
       :error         => nil,
@@ -24,6 +26,7 @@ class Spider
     begin
       uri = URI.parse(url)
       @info[:url] = url
+      @info[:spider_name] = @name
 
       raise "Invalid host name. Forgot to include 'http://'?" if uri.host.nil?
 
@@ -35,11 +38,11 @@ class Spider
 
       @info[:response_code] = response_code
       @info[:response_time] = end_time - start_time
-      @info[:error] = false
-      @info[:error_detail] = ""
+      @info[:error]         = false
+      @info[:error_detail]  = ""
 
       if response_code >= 400
-        @info[:error] = true
+        @info[:error]        = true
         @info[:error_detail] = StatusMessage[response_code]
       end
 
@@ -48,8 +51,8 @@ class Spider
     
       @info[:response_code] = ""
       @info[:response_time] = 0
-      @info[:error] = true
-      @info[:error_detail] = error.message
+      @info[:error]         = true
+      @info[:error_detail]  = error.message
     end
 
     @info
