@@ -1,6 +1,8 @@
 Dependencies
 ============
 
+Legacy code. Someday I will update this.
+
 System
 ------
 ruby 1.8.6-p111
