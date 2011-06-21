@@ -15,3 +15,5 @@ Gems
 - rake (0.9.2)
 - rspec (2.6.0)
 - ZenTest (4.5.0)
+- activerecord (1.14.4)
+- activesupport (1.3.1)
