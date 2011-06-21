@@ -15,14 +15,14 @@ class GenericMailer
   end
 
   def send_message( from_addr, to_addrs, subject, body, attachment_file = nil )
-    to_addrs = to_addrs.split(',').to_a
+    to_addrs = to_addrs.split(',').map{|x| x.strip}
 
     if attachment_file
       message = attachment_message( from_addr, to_addrs, subject, body, attachment_file )
     else
       message = simple_message( from_addr, to_addrs, subject, body )
     end
-
+    
     @smtp.send_message( message, from_addr, to_addrs )
   end
 
