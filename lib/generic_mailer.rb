@@ -15,7 +15,7 @@ class GenericMailer
   end
 
   def send_message( from_addr, to_addrs, subject, body, attachment_file = nil )
-    to_addrs = to_addrs.to_a
+    to_addrs = to_addrs.split(',').to_a
 
     if attachment_file
       message = attachment_message( from_addr, to_addrs, subject, body, attachment_file )
@@ -51,7 +51,7 @@ EOF
 
     # Define the main headers.
     part1 =<<EOF
-From: #{from_addr}
+From: #{from_addr.split('@')[0].titlecase} <#{from_addr}>
 To: #{to_addrs.join(',')}
 Subject: #{subject} 
 MIME-Version: 1.0
