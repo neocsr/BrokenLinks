@@ -53,6 +53,15 @@ class Spider
       @info[:response_time] = 0
       @info[:error]         = true
       @info[:error_detail]  = error.message
+
+    rescue Timeout::Error => error
+      @output.puts error.message
+    
+      @info[:response_code] = ""
+      @info[:response_time] = 0
+      @info[:error]         = true
+      @info[:error_detail]  = error.message
+
     end
 
     @info
