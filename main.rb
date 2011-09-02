@@ -6,12 +6,14 @@ require 'lib/generic_mailer'
 require 'active_record'
 
 # Config
-ENVIRONMENT = "test"
+ENVIRONMENT = "test" # "test|development|production"
 THREADS = 5
 SLEEP   = 0.2
 threads = []
 spiders = []
 ankens_with_error = []
+excluded_urls = File.readlines("excluded_urls.txt").map{|x| x.strip}
+excluded_url = nil
 
 start_time = Time.now
 
@@ -25,7 +27,21 @@ class SpiderUrl < ActiveRecord::Base
   set_primary_key  "S_BLOCK_URL_ID"
 end
 
-URLS = SpiderUrl.find(:all)
+URLS = SpiderUrl.find(:all, :limit => 400)
+
+puts "Initial Urls: #{URLS.size}"
+
+# Filter urls
+while (excluded_url = excluded_urls.pop)
+  URLS.delete_if do |x| 
+    if x["S_BLOCK_URL"] == excluded_url 
+      puts "Deleted: #{excluded_url}"
+      true
+    end
+  end
+end
+
+puts "Filtered Urls: #{URLS.size}"
 
 # Queues
 source_queue = Queue.new
@@ -52,7 +68,9 @@ end
 end
 
 threads.each do |th|
-  th.join
+  # th.join
+  # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
+  th.join if th != Thread.current
 end
 
 
