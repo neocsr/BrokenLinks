@@ -27,7 +27,7 @@ class SpiderUrl < ActiveRecord::Base
   set_primary_key  "S_BLOCK_URL_ID"
 end
 
-URLS = SpiderUrl.find(:all, :limit => 200)
+URLS = SpiderUrl.find(:all)
 
 puts "Initial Urls: #{URLS.size}"
 
