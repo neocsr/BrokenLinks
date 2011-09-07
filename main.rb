@@ -27,7 +27,7 @@ class SpiderUrl < ActiveRecord::Base
   set_primary_key  "S_BLOCK_URL_ID"
 end
 
-URLS = SpiderUrl.find(:all, :limit => 400)
+URLS = SpiderUrl.find(:all, :limit => 200)
 
 puts "Initial Urls: #{URLS.size}"
 
@@ -53,26 +53,32 @@ end
 
 # Threads setup
 0.upto(THREADS - 1) do |i|
-  threads << Thread.new(i) do
-    spiders << Spider.new(i)
+  threads << Thread.new(i) do |j|
+    spiders << Spider.new(j)
+    
     while source_queue.size > 0
-      anken = source_queue.pop
-      info = spiders[i].process_url(anken["S_BLOCK_URL"])
 
-      puts info[:response_code]
+      if spiders[j]
+        anken = source_queue.pop
+        info = spiders[j].process_url(anken["S_BLOCK_URL"])
+        puts info[:response_code]
+        ankens_with_error << anken.merge(info) if info[:error]
+      end
 
-      ankens_with_error << anken.merge(info) if info[:error]
       sleep SLEEP
+
     end
+
   end
 end
 
 threads.each do |th|
-  # th.join
+  th.join
   # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
-  th.join if th != Thread.current
+  # th.join if th != Thread.current
 end
 
+puts "Preparing email..."
 
 attachment = "urls_check_#{Time.now.strftime('%Y%m%d')}.csv"
 file = File.open(attachment, 'w+')
@@ -96,13 +102,13 @@ from_address = smtp_config[ENVIRONMENT]["from_address"]
 to_addresses = smtp_config[ENVIRONMENT]["to_addresses"]
 subject = "URL Check: #{Time.now.strftime('%Y-%m-%d')}"
 body = <<EOF
-Summary
-=======
+レポート
+======
 
-Total Urls: #{URLS.size}
-Total Urls with Error: #{ankens_with_error.size}
+「全てのURL」 #{URLS.size}件
+「エラーURL」 #{ankens_with_error.size}件
 
-Report date: #{Time.now.strftime('%Y-%m-%d')}
+日付 #{Time.now.strftime('%Y-%m-%d')}
 
 EOF
 
@@ -110,6 +116,8 @@ mailer = GenericMailer.new
 mailer.start(smtp_config[ENVIRONMENT])
 mailer.send_message(from_address, to_addresses, subject, body, attachment)
 mailer.finish
+
+puts "Email sent..."
 
 end_time = Time.now
 delay = end_time - start_time
